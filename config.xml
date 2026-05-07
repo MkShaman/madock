@@ -19,6 +19,15 @@
                         <name>example.com</name>
                     </base>
                 </hosts>-->
+                <!--<routes>
+                    <store_cl_es>
+                        <host_ref>base</host_ref>
+                        <path_prefix>/cl/es</path_prefix>
+                        <mage_run_code>store_cl_es</mage_run_code>
+                        <mage_run_type>store</mage_run_type>
+                        <strip_path_prefix>true</strip_path_prefix>
+                    </store_cl_es>
+                </routes>-->
                 <ssl>
                     <enabled>true</enabled>
                 </ssl>

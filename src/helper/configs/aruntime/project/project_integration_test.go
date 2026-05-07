@@ -93,97 +93,97 @@ func setupTestEnvironment(t *testing.T, projectName, hostName string) *testEnv {
 	// Create project config via SaveInFile with Magento 2.4.8 settings
 	projectConfigPath := filepath.Join(execDir, "projects", projectName, "config.xml")
 	projectConfigData := map[string]string{
-		"platform":                     "magento2",
-		"language":                     "php",
-		"path":                         runDir,
-		"php/enabled":                  "true",
-		"php/version":                  "8.4",
-		"php/composer/version":         "2",
-		"php/xdebug/version":           "3.4.4",
-		"php/xdebug/remote_host":       "host.docker.internal",
-		"php/xdebug/ide_key":           "PHPSTORM",
-		"php/xdebug/enabled":           "false",
-		"php/xdebug/mode":              "debug",
-		"php/ioncube/enabled":          "false",
-		"php/nodejs/enabled":           "false",
-		"timezone":                     "Europe/Kiev",
-		"workdir":                      "/var/www/html",
-		"public_dir":                   "pub",
-		"composer_dir":                 "",
-		"db/repository":                "mariadb",
-		"db/version":                   "11.4",
-		"db/root_password":             "password",
-		"db/user":                      "magento",
-		"db/password":                  "magento",
-		"db/database":                  "magento",
-		"db/phpmyadmin/enabled":        "false",
-		"db2/enabled":                  "false",
-		"search/engine":                "OpenSearch",
-		"search/elasticsearch/enabled": "false",
-		"search/elasticsearch/version": "8.17.6",
-		"search/elasticsearch/repository": "elasticsearch",
-		"search/opensearch/enabled":    "true",
-		"search/opensearch/version":    "2.19.0",
-		"search/opensearch/repository": "opensearchproject/opensearch",
-		"search/opensearch/dashboard/enabled":    "false",
-		"search/opensearch/dashboard/repository": "opensearchproject/opensearch-dashboards",
+		"platform":                                  "magento2",
+		"language":                                  "php",
+		"path":                                      runDir,
+		"php/enabled":                               "true",
+		"php/version":                               "8.4",
+		"php/composer/version":                      "2",
+		"php/xdebug/version":                        "3.4.4",
+		"php/xdebug/remote_host":                    "host.docker.internal",
+		"php/xdebug/ide_key":                        "PHPSTORM",
+		"php/xdebug/enabled":                        "false",
+		"php/xdebug/mode":                           "debug",
+		"php/ioncube/enabled":                       "false",
+		"php/nodejs/enabled":                        "false",
+		"timezone":                                  "Europe/Kiev",
+		"workdir":                                   "/var/www/html",
+		"public_dir":                                "pub",
+		"composer_dir":                              "",
+		"db/repository":                             "mariadb",
+		"db/version":                                "11.4",
+		"db/root_password":                          "password",
+		"db/user":                                   "magento",
+		"db/password":                               "magento",
+		"db/database":                               "magento",
+		"db/phpmyadmin/enabled":                     "false",
+		"db2/enabled":                               "false",
+		"search/engine":                             "OpenSearch",
+		"search/elasticsearch/enabled":              "false",
+		"search/elasticsearch/version":              "8.17.6",
+		"search/elasticsearch/repository":           "elasticsearch",
+		"search/opensearch/enabled":                 "true",
+		"search/opensearch/version":                 "2.19.0",
+		"search/opensearch/repository":              "opensearchproject/opensearch",
+		"search/opensearch/dashboard/enabled":       "false",
+		"search/opensearch/dashboard/repository":    "opensearchproject/opensearch-dashboards",
 		"search/elasticsearch/dashboard/enabled":    "false",
 		"search/elasticsearch/dashboard/repository": "kibana",
-		"redis/enabled":                "false",
-		"redis/repository":             "redis",
-		"redis/version":                "8.0",
-		"valkey/enabled":               "false",
-		"valkey/repository":            "valkey/valkey",
-		"valkey/version":               "8.1.3",
-		"rabbitmq/enabled":             "false",
-		"rabbitmq/repository":          "rabbitmq",
-		"rabbitmq/version":             "4.1",
-		"nodejs/enabled":               "false",
-		"nodejs/repository":            "node",
-		"nodejs/version":               "18.15.0",
-		"nodejs/major_version":         "18",
-		"nodejs/yarn/enabled":          "false",
-		"cron/enabled":                 "false",
-		"nginx/ssl/enabled":            "true",
-		"nginx/http/version":           "http2",
-		"nginx/run_type":               "website",
-		"nginx/default_host_first_level": ".test",
-		"nginx/port/unsecure":          "80",
-		"nginx/port/secure":            "443",
-		"nginx/port/internal":          "80",
-		"nginx/interface_ip":           "",
-		"os/name":                      "ubuntu",
-		"os/version":                   "22.04",
-		"container_name_prefix":        "madock_",
-		"restart_policy":               "no",
-		"proxy/enabled":                "true",
-		"proxy/timeout/connect":        "60",
-		"proxy/timeout/send":           "300",
-		"proxy/timeout/read":           "300",
-		"proxy/gzip/enabled":           "true",
-		"proxy/rate_limit/enabled":     "true",
-		"proxy/rate_limit/rate":        "1000",
-		"proxy/rate_limit/burst":       "2000",
-		"isolation/enabled":            "false",
-		"varnish/enabled":              "false",
-		"grafana/enabled":              "false",
-		"claude/enabled":               "false",
-		"claude/nodejs_repository":     "node",
-		"claude/nodejs_version":        "22.19.0",
-		"ssh/auth_type":                "key",
-		"ssh/port":                     "22",
-		"magento/admin_user":           "admin",
-		"magento/admin_password":       "admin123",
-		"magento/admin_first_name":     "admin",
-		"magento/admin_last_name":      "admin",
-		"magento/admin_email":          "admin@admin.com",
-		"magento/admin_frontname":      "admin",
-		"magento/locale":               "en_US",
-		"magento/currency":             "USD",
-		"magento/timezone":             "America/Chicago",
-		"magento/cloud/enabled":        "false",
-		"magento/mftf/enabled":         "false",
-		"magento/n98magerun/enabled":   "false",
+		"redis/enabled":                             "false",
+		"redis/repository":                          "redis",
+		"redis/version":                             "8.0",
+		"valkey/enabled":                            "false",
+		"valkey/repository":                         "valkey/valkey",
+		"valkey/version":                            "8.1.3",
+		"rabbitmq/enabled":                          "false",
+		"rabbitmq/repository":                       "rabbitmq",
+		"rabbitmq/version":                          "4.1",
+		"nodejs/enabled":                            "false",
+		"nodejs/repository":                         "node",
+		"nodejs/version":                            "18.15.0",
+		"nodejs/major_version":                      "18",
+		"nodejs/yarn/enabled":                       "false",
+		"cron/enabled":                              "false",
+		"nginx/ssl/enabled":                         "true",
+		"nginx/http/version":                        "http2",
+		"nginx/run_type":                            "website",
+		"nginx/default_host_first_level":            ".test",
+		"nginx/port/unsecure":                       "80",
+		"nginx/port/secure":                         "443",
+		"nginx/port/internal":                       "80",
+		"nginx/interface_ip":                        "",
+		"os/name":                                   "ubuntu",
+		"os/version":                                "22.04",
+		"container_name_prefix":                     "madock_",
+		"restart_policy":                            "no",
+		"proxy/enabled":                             "true",
+		"proxy/timeout/connect":                     "60",
+		"proxy/timeout/send":                        "300",
+		"proxy/timeout/read":                        "300",
+		"proxy/gzip/enabled":                        "true",
+		"proxy/rate_limit/enabled":                  "true",
+		"proxy/rate_limit/rate":                     "1000",
+		"proxy/rate_limit/burst":                    "2000",
+		"isolation/enabled":                         "false",
+		"varnish/enabled":                           "false",
+		"grafana/enabled":                           "false",
+		"claude/enabled":                            "false",
+		"claude/nodejs_repository":                  "node",
+		"claude/nodejs_version":                     "22.19.0",
+		"ssh/auth_type":                             "key",
+		"ssh/port":                                  "22",
+		"magento/admin_user":                        "admin",
+		"magento/admin_password":                    "admin123",
+		"magento/admin_first_name":                  "admin",
+		"magento/admin_last_name":                   "admin",
+		"magento/admin_email":                       "admin@admin.com",
+		"magento/admin_frontname":                   "admin",
+		"magento/locale":                            "en_US",
+		"magento/currency":                          "USD",
+		"magento/timezone":                          "America/Chicago",
+		"magento/cloud/enabled":                     "false",
+		"magento/mftf/enabled":                      "false",
+		"magento/n98magerun/enabled":                "false",
 	}
 
 	if hostName != "" {
@@ -257,6 +257,38 @@ func TestMakeConfMagento2_NginxHostConfig(t *testing.T) {
 	nginxConf := filepath.Join(ctxDir, "nginx.conf")
 
 	assertFileContains(t, nginxConf, "magento248.test")
+}
+
+func TestMakeConfMagento2_PathBasedRoutes(t *testing.T) {
+	env := setupTestEnvironment(t, "routeproject", "multistore.test")
+
+	configs.SetParam(env.projectName, "nginx/routes/cl_es/host_ref", "base", "default", "")
+	configs.SetParam(env.projectName, "nginx/routes/cl_es/path_prefix", "/cl/es", "default", "")
+	configs.SetParam(env.projectName, "nginx/routes/cl_es/mage_run_code", "ospreycles", "default", "")
+	configs.SetParam(env.projectName, "nginx/routes/cl_es/mage_run_type", "store", "default", "")
+
+	MakeConf(env.projectName)
+
+	ctxDir := filepath.Join(env.execDir, "aruntime", "projects", env.projectName, "ctx")
+	nginxConf := filepath.Join(ctxDir, "nginx.conf")
+
+	assertFileContains(t, nginxConf, "map $http_host $MADOCK_DEFAULT_MAGE_RUN_CODE {")
+	assertFileContains(t, nginxConf, "multistore.test base;")
+	assertFileContains(t, nginxConf, "# Path-based routing maps")
+	assertFileContains(t, nginxConf, "map $http_host:$request_uri $MADOCK_PATH_MAGE_RUN_CODE {")
+	assertFileContains(t, nginxConf, "ospreycles;")
+	assertFileContains(t, nginxConf, "map $http_host:$request_uri $MADOCK_PATH_MAGE_RUN_TYPE {")
+	assertFileContains(t, nginxConf, "store;")
+	// Stripped URI maps for REQUEST_URI override
+	assertFileContains(t, nginxConf, "map $http_host:$request_uri $MADOCK_STRIPPED_RAW {")
+	assertFileContains(t, nginxConf, "map $MADOCK_STRIPPED_RAW $MADOCK_REQUEST_URI {")
+	assertFileContains(t, nginxConf, "fastcgi_param  REQUEST_URI $MADOCK_REQUEST_URI;")
+	assertFileContains(t, nginxConf, "if ($MADOCK_PATH_MAGE_RUN_CODE != \"\") {")
+	assertFileContains(t, nginxConf, "set $MAGE_RUN_CODE $MADOCK_PATH_MAGE_RUN_CODE;")
+	assertFileContains(t, nginxConf, "set $MAGE_RUN_TYPE $MADOCK_PATH_MAGE_RUN_TYPE;")
+	assertFileContains(t, nginxConf, "# Path-based route strip prefix: cl_es")
+	assertFileContains(t, nginxConf, "if ($MADOCK_PATH_MAGE_RUN_CODE = \"ospreycles\") {")
+	assertFileContains(t, nginxConf, "rewrite ^")
 }
 
 func TestMakeConfMagento2_DockerComposeServices(t *testing.T) {

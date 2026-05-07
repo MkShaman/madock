@@ -1,9 +1,60 @@
 package configs
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 )
+
+func TestGetNginxRoutes(t *testing.T) {
+	config := map[string]string{
+		"nginx/run_type":                               "website",
+		"nginx/hosts/base/name":                        "example.test",
+		"nginx/routes/global_es/host_ref":              "base",
+		"nginx/routes/global_es/path_prefix":           "es",
+		"nginx/routes/global_es/mage_run_code":         "storees",
+		"nginx/routes/global_es/mage_run_type":         "store",
+		"nginx/routes/global_es/strip_path_prefix":     "true",
+		"nginx/routes/global_es_special/host_ref":      "base",
+		"nginx/routes/global_es_special/path_prefix":   "/es/special/",
+		"nginx/routes/global_es_special/mage_run_code": "storespecial",
+	}
+
+	routes := GetNginxRoutes(config)
+	if len(routes) != 2 {
+		t.Fatalf("GetNginxRoutes() returned %d routes, want 2", len(routes))
+	}
+
+	if routes[0].ID != "global_es_special" {
+		t.Fatalf("routes should be sorted by longest path prefix first, got %q first", routes[0].ID)
+	}
+
+	first := routes[0]
+	if first.HostName != "example.test" {
+		t.Fatalf("first route HostName = %q, want %q", first.HostName, "example.test")
+	}
+	if first.PathPrefix != "/es/special" {
+		t.Fatalf("first route PathPrefix = %q, want %q", first.PathPrefix, "/es/special")
+	}
+	if first.MageRunType != "website" {
+		t.Fatalf("first route MageRunType = %q, want fallback %q", first.MageRunType, "website")
+	}
+
+	second := routes[1]
+	wantSecond := NginxRoute{
+		ID:              "global_es",
+		HostRef:         "base",
+		HostName:        "example.test",
+		PathPrefix:      "/es",
+		MageRunCode:     "storees",
+		MageRunType:     "store",
+		StripPathPrefix: true,
+		Enabled:         true,
+	}
+	if !reflect.DeepEqual(second, wantSecond) {
+		t.Fatalf("second route = %#v, want %#v", second, wantSecond)
+	}
+}
 
 // ---------------------------------------------------------------------------
 // evaluateCondition
@@ -510,12 +561,12 @@ func TestSplitScopeKey(t *testing.T) {
 		{"scopes/default/db/password", "db/password"},
 		{"scopes/staging/rabbitmq/password", "rabbitmq/password"},
 		{"scopes/default/search/elasticsearch/auth/password", "search/elasticsearch/auth/password"},
-		{"db/password", ""},           // no scope prefix
-		{"scopes/", ""},               // incomplete
-		{"scopes/default/", ""},       // scope but no key after
-		{"scopes/default", ""},        // no trailing slash
-		{"", ""},                      // empty
-		{"other/prefix/key", ""},      // wrong prefix
+		{"db/password", ""},      // no scope prefix
+		{"scopes/", ""},          // incomplete
+		{"scopes/default/", ""},  // scope but no key after
+		{"scopes/default", ""},   // no trailing slash
+		{"", ""},                 // empty
+		{"other/prefix/key", ""}, // wrong prefix
 	}
 
 	for _, tt := range tests {
@@ -538,7 +589,7 @@ func TestCompareVersions_EdgeCases(t *testing.T) {
 		v1, v2   string
 		expected int
 	}{
-		{"non-numeric segment", "8.4-beta", "8.4", -1},       // atoi("4-beta") = 0, so compares as 8.0 vs 8.4
+		{"non-numeric segment", "8.4-beta", "8.4", -1}, // atoi("4-beta") = 0, so compares as 8.0 vs 8.4
 		{"both empty", "", "", 0},
 		{"one empty", "1.0", "", 1},
 		{"other empty", "", "1.0", -1},

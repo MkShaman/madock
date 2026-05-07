@@ -194,3 +194,10 @@ type ControllerGeneralDbInfo struct {
 type ControllerGeneralConfigList struct {
 	attr.Arguments
 }
+
+type ControllerMagentoRoutesGenerate struct {
+	attr.Arguments
+	DryRun   bool   `arg:"--dry-run" help:"Preview generated routes without changing config.xml"`
+	HostCode string `arg:"--host-code" help:"Use this nginx host code for all generated routes"`
+	File     string `arg:"--file" help:"Path to env.php inside the container (default: <workdir>/app/etc/env.php)"`
+}

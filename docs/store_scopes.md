@@ -43,3 +43,54 @@ madock config:set --name=HOSTS --value="example.com:store_code_1 example2.com:st
 After changing run_type or hosts mapping, run:
 
 madock rebuild
+
+## Path-based multistore routing on one domain
+
+If one domain serves multiple Magento websites or store views by URL path, `run_type` alone is not enough.
+
+Example:
+
+- `https://example.test/cl/es/`
+- `https://example.test/au/en/`
+
+In that setup, the default host mapping still chooses only one fallback `MAGE_RUN_CODE` for `example.test`. To route by both host and path, add explicit route rules under `nginx/routes`.
+
+Example project config:
+
+```xml
+<nginx>
+  <hosts>
+    <base>
+      <name>example.test</name>
+    </base>
+  </hosts>
+  <routes>
+    <cl_es>
+      <host_ref>base</host_ref>
+      <path_prefix>/cl/es</path_prefix>
+      <mage_run_code>store_cl_es</mage_run_code>
+      <mage_run_type>store</mage_run_type>
+      <strip_path_prefix>true</strip_path_prefix>
+    </cl_es>
+    <au_en>
+      <host_ref>base</host_ref>
+      <path_prefix>/au/en</path_prefix>
+      <mage_run_code>store_au_en</mage_run_code>
+      <mage_run_type>store</mage_run_type>
+      <strip_path_prefix>true</strip_path_prefix>
+    </au_en>
+  </routes>
+</nginx>
+```
+
+Notes:
+
+- `host_ref` points to a host defined in `nginx/hosts`.
+- `strip_path_prefix` defaults to `true` when omitted.
+- Host-only mapping remains the backward-compatible fallback for requests that do not match any path rule.
+
+For a full Magento path-based routing workflow, including automatic route generation from `app/etc/env.php`, see [Magento Path-Based Routing](magento_path_routing.md).
+
+After changing routes, run:
+
+madock rebuild

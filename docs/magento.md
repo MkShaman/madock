@@ -128,6 +128,18 @@ grunt watch
 
 See [LiveReload documentation](livereload.md) for auto-refresh setup.
 
+### Path-Based Multistore Routing
+
+If one Magento domain serves multiple websites or store views by URL path, use madock path routes instead of host-only mapping.
+
+```bash
+madock magento:routes:generate --dry-run
+madock magento:routes:generate
+madock rebuild
+```
+
+See [Magento Path-Based Routing](magento_path_routing.md) for the full workflow and manual config examples.
+
 ## Testing
 
 ### MFTF (Magento Functional Testing Framework)

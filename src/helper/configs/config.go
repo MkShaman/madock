@@ -418,7 +418,6 @@ func evaluateCondition(condition string) bool {
 	return true
 }
 
-
 // CompareVersions compares two version strings (e.g., "8.4" vs "8.3.1")
 // Returns: 1 if v1 > v2, -1 if v1 < v2, 0 if equal
 func CompareVersions(v1, v2 string) int {
@@ -452,6 +451,9 @@ func CompareVersions(v1, v2 string) int {
 
 func IsOption(name string) bool {
 	if strings.Contains(name, "/hosts/") {
+		return true
+	}
+	if strings.Contains(name, "/routes/") {
 		return true
 	}
 	for key := range GetCurrentProjectConfig() {

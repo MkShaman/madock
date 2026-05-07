@@ -182,6 +182,7 @@ IMPORTANT: Please, read all items before starting work.
 * Kibana. URL http://{you_domain_name}/kibana
 * Mailpit. Default URL http://localhost:8025
 * [Store scopes](docs/store_scopes.md): website vs store
+* [Magento path-based routing](docs/magento_path_routing.md)
 * [MCP Server](docs/mcp.md) (AI integration for Claude Code, Cursor, VS Code)
 
 ## Donations

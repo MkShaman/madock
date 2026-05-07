@@ -121,6 +121,9 @@ func makeNginxConf(projectName string) {
 		}
 	}
 	str = strings.Replace(str, "{{{nginx/host_names}}}", hostName, -1)
+	str = strings.Replace(str, "{{{nginx/path_based_map_blocks}}}", buildNginxPathBasedMapBlocks(projectConf), -1)
+	str = strings.Replace(str, "{{{nginx/path_based_route_blocks}}}", buildNginxPathBasedRouteBlocks(projectConf), -1)
+	str = strings.Replace(str, "{{{nginx/fastcgi_request_uri_override}}}", buildNginxFastcgiRequestUriOverride(projectConf), -1)
 	str = strings.Replace(str, "{{{project_name}}}", strings.ToLower(projectName), -1)
 
 	str = strings.Replace(str, "{{{scope}}}", configs.GetActiveScope(projectName, false, "-"), -1)
@@ -137,6 +140,124 @@ func makeNginxConf(projectName string) {
 	if err != nil {
 		log.Fatalf("Unable to write file: %v", err)
 	}
+}
+
+// buildNginxPathBasedMapBlocks generates nginx map directives (for http context, before server block)
+// that resolve $MADOCK_PATH_MAGE_RUN_CODE and $MADOCK_PATH_MAGE_RUN_TYPE from $http_host:$request_uri.
+// Using map instead of if+regex avoids the nginx rewrite-phase variable evaluation issue where
+// if ($http_host$request_uri ~ regex) fails to match even when the values are correct.
+// Also generates $MADOCK_STRIPPED_RAW and $MADOCK_REQUEST_URI maps for stripping the path
+// prefix from REQUEST_URI before passing to PHP, so Magento can route correctly.
+func buildNginxPathBasedMapBlocks(projectConf map[string]string) string {
+	routes := configs.GetNginxRoutes(projectConf)
+	if len(routes) == 0 {
+		return ""
+	}
+
+	var codeEntries, typeEntries, strippedEntries []string
+	for _, route := range routes {
+		if route.MageRunCode != "" {
+			codeEntries = append(codeEntries, fmt.Sprintf("    ~^%s:%s(?:/|$)    %s;", route.HostRegex(), route.PathRegex(), route.MageRunCode))
+		}
+		if route.MageRunType != "" {
+			typeEntries = append(typeEntries, fmt.Sprintf("    ~^%s:%s(?:/|$)    %s;", route.HostRegex(), route.PathRegex(), route.MageRunType))
+		}
+		// Strip path prefix from REQUEST_URI so Magento receives the logical path.
+		// Capture group $1 gives the sub-path (empty string for root → resolved to / via wrapper map).
+		strippedEntries = append(strippedEntries, fmt.Sprintf("    ~^%s:%s(/.*)?$    $1;", route.HostRegex(), route.PathRegex()))
+	}
+
+	if len(codeEntries) == 0 {
+		return ""
+	}
+
+	var sb strings.Builder
+	sb.WriteString("\n# Path-based routing maps\n")
+	sb.WriteString("map $http_host:$request_uri $MADOCK_PATH_MAGE_RUN_CODE {\n")
+	for _, entry := range codeEntries {
+		sb.WriteString(entry + "\n")
+	}
+	sb.WriteString("    default    \"\";\n")
+	sb.WriteString("}\n")
+
+	if len(typeEntries) > 0 {
+		sb.WriteString("map $http_host:$request_uri $MADOCK_PATH_MAGE_RUN_TYPE {\n")
+		for _, entry := range typeEntries {
+			sb.WriteString(entry + "\n")
+		}
+		sb.WriteString("    default    \"\";\n")
+		sb.WriteString("}\n")
+	}
+
+	// Map that strips the path prefix, giving the sub-path (may be empty for root requests).
+	sb.WriteString("map $http_host:$request_uri $MADOCK_STRIPPED_RAW {\n")
+	for _, entry := range strippedEntries {
+		sb.WriteString(entry + "\n")
+	}
+	sb.WriteString("    default    $request_uri;\n")
+	sb.WriteString("}\n")
+
+	// Resolve empty stripped URI (root requests like /mx/en/) to "/".
+	sb.WriteString("map $MADOCK_STRIPPED_RAW $MADOCK_REQUEST_URI {\n")
+	sb.WriteString("    \"\"    /;\n")
+	sb.WriteString("    default    $MADOCK_STRIPPED_RAW;\n")
+	sb.WriteString("}\n")
+
+	return sb.String()
+}
+
+// buildNginxFastcgiRequestUriOverride returns a fastcgi_param directive that overrides
+// REQUEST_URI with the path-prefix-stripped value ($MADOCK_REQUEST_URI).
+// For non-path-based routes $MADOCK_REQUEST_URI = $request_uri (no-op).
+// This must be placed AFTER 'include fastcgi_params' in every PHP fastcgi location
+// block so that our value takes precedence.
+func buildNginxFastcgiRequestUriOverride(projectConf map[string]string) string {
+	if len(configs.GetNginxRoutes(projectConf)) == 0 {
+		return ""
+	}
+	return "\n        fastcgi_param  REQUEST_URI $MADOCK_REQUEST_URI;"
+}
+
+// buildNginxPathBasedRouteBlocks generates the server-block directives that apply
+// path-based routing overrides using the map variables set by buildNginxPathBasedMapBlocks.
+func buildNginxPathBasedRouteBlocks(projectConf map[string]string) string {
+	routes := configs.GetNginxRoutes(projectConf)
+	if len(routes) == 0 {
+		return ""
+	}
+
+	var sb strings.Builder
+
+	// Single if block: apply map-resolved code/type overrides.
+	// Map variables are lazy-evaluated at access time (after try_files), unlike
+	// if+regex which fails during the rewrite phase after internal redirects.
+	hasOverride := false
+	for _, route := range routes {
+		if route.MageRunCode != "" || route.MageRunType != "" {
+			hasOverride = true
+			break
+		}
+	}
+	if hasOverride {
+		sb.WriteString("\n    # Apply path-based store routing via map variables\n")
+		sb.WriteString("    if ($MADOCK_PATH_MAGE_RUN_CODE != \"\") {\n")
+		sb.WriteString("        set $MAGE_RUN_CODE $MADOCK_PATH_MAGE_RUN_CODE;\n")
+		sb.WriteString("        set $MAGE_RUN_TYPE $MADOCK_PATH_MAGE_RUN_TYPE;\n")
+		sb.WriteString("    }\n")
+	}
+
+	// Per-route strip_path_prefix rewrites (only for routes with StripPathPrefix=true).
+	// Uses a simple string-equality if on the already-resolved map variable.
+	for _, route := range routes {
+		if route.StripPathPrefix && route.MageRunCode != "" {
+			sb.WriteString(fmt.Sprintf("\n    # Path-based route strip prefix: %s\n", route.ID))
+			sb.WriteString(fmt.Sprintf("    if ($MADOCK_PATH_MAGE_RUN_CODE = \"%s\") {\n", route.MageRunCode))
+			sb.WriteString(fmt.Sprintf("        rewrite ^%s(?:/(.*))?$ /$1 break;\n", route.PathRegex()))
+			sb.WriteString("    }\n")
+		}
+	}
+
+	return sb.String()
 }
 
 func MakePhpDockerfile(projectName string) {
