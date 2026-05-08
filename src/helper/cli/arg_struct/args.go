@@ -71,8 +71,10 @@ type ControllerGeneralCleanCache struct {
 
 type ControllerGeneralConfig struct {
 	attr.Arguments
-	Name  string `arg:"-n,--name" help:"Parameter name"`
-	Value string `arg:"-v,--value" help:"Parameter value"`
+	Name   string   `arg:"-n,--name" help:"Parameter name"`
+	Value  string   `arg:"-v,--value" help:"Parameter value"`
+	Global bool     `arg:"-g,--global" help:"Save to global config (projects/config.xml) instead of project config"`
+	Args   []string `arg:"positional"`
 }
 
 type ControllerGeneralDbExport struct {
@@ -157,6 +159,11 @@ type ControllerGeneralRemoteSyncMedia struct {
 	ImagesOnly bool   `arg:"-i,--images-only" help:"Sync images only"`
 	Compress   bool   `arg:"-c,--compress" help:"Compress images"`
 	SshType    string `arg:"-s,--ssh-type" help:"SSH type (dev, stage, prod)"`
+}
+
+type ControllerGeneralMcp struct {
+	attr.Arguments
+	Dir string `arg:"-d,--dir" help:"Project directory (required when MCP server is started outside the project folder)"`
 }
 
 type ControllerGeneralProjectClone struct {

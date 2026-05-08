@@ -90,6 +90,20 @@ Grafana provides a comprehensive monitoring solution with pre-configured dashboa
 ### Mailpit
 * [axllent/mailpit](https://hub.docker.com/r/axllent/mailpit)
 
+**Configuration**: The SMTP port (default `1025`) can be changed via `proxy/mailpit/smtp_port` config to avoid port conflicts:
+
+```bash
+# Change globally for all projects
+madock config:set proxy/mailpit/smtp_port 1026 --global
+madock rebuild
+
+# Disable Mailpit completely
+madock service:disable mailpit --global
+madock rebuild
+```
+
+Mailpit UI runs on port `8025` and is used for viewing sent emails during development.
+
 ## Testing
 
 ### Selenium

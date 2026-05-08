@@ -198,6 +198,38 @@ This project has been possible thanks to the following resources:
 
 ## License
 
+
+## Important Configuration Notes
+
+### Mailpit SMTP Port Conflicts
+If Mailpit (email testing service) fails to start due to port `1025` being already in use by Docker Desktop or other services, change it globally:
+
+```bash
+madock config:set proxy/mailpit/smtp_port 1026 --global
+madock rebuild
+```
+
+See [docs/docker_images.md](docs/docker_images.md) for more details.
+
+### MCP Server for AI Assistants
+When using madock with AI assistants (Claude Code, Cursor, VS Code), always specify the project directory with `-d` flag to ensure correct container resolution:
+
+```json
+{
+  "servers": {
+    "madock": {
+      "command": "madock",
+      "args": ["mcp", "-d", "${workspaceFolder}"],
+      "type": "stdio"
+    }
+  }
+}
+```
+
+See [docs/mcp.md](docs/mcp.md) for complete setup instructions.
+
+## License
+
 * [The MIT License](https://opensource.org/licenses/MIT)
 
 ## Copyright

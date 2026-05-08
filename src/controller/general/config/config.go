@@ -64,14 +64,24 @@ func ShowEnv() {
 func SetEnvOption() {
 	args := attr.Parse(new(arg_struct.ControllerGeneralConfig)).(*arg_struct.ControllerGeneralConfig)
 	name := strings.ToLower(args.Name)
+	if name == "" && len(args.Args) > 0 {
+		name = strings.ToLower(args.Args[0])
+	}
 	val := args.Value
-	activeScope := "default"
-	projectConfig := configs.GetCurrentProjectConfig()
-	if _, ok := projectConfig["activeScope"]; ok {
-		activeScope = projectConfig["activeScope"]
+	if val == "" && len(args.Args) > 1 {
+		val = args.Args[1]
 	}
 	if len(name) > 0 && configs.IsOption(name) {
-		configs.SetParam(configs.GetProjectName(), name, val, activeScope, "")
+		if args.Global {
+			configs.SetParam(configs.MainConfigCode, name, val, "default", configs.MainConfigCode)
+		} else {
+			activeScope := "default"
+			projectConfig := configs.GetCurrentProjectConfig()
+			if _, ok := projectConfig["activeScope"]; ok {
+				activeScope = projectConfig["activeScope"]
+			}
+			configs.SetParam(configs.GetProjectName(), name, val, activeScope, "")
+		}
 	}
 }
 

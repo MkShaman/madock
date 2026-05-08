@@ -11,11 +11,16 @@ import (
 	"time"
 
 	"github.com/faradey/madock/v3/src/command"
+	"github.com/faradey/madock/v3/src/helper/cli/arg_struct"
+	"github.com/faradey/madock/v3/src/helper/cli/attr"
 	"github.com/faradey/madock/v3/src/helper/paths"
 	"github.com/faradey/madock/v3/src/version"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )
+
+// projectDir holds the resolved project directory for sub-process invocations.
+var projectDir string
 
 func init() {
 	command.Register(&command.Definition{
@@ -23,10 +28,23 @@ func init() {
 		Handler:  Execute,
 		Help:     "Start MCP (Model Context Protocol) server for AI assistants",
 		Category: "general",
+		ArgsType: new(arg_struct.ControllerGeneralMcp),
 	})
 }
 
 func Execute() {
+	args := attr.Parse(new(arg_struct.ControllerGeneralMcp)).(*arg_struct.ControllerGeneralMcp)
+
+	if args.Dir != "" {
+		abs, err := filepath.Abs(args.Dir)
+		if err == nil {
+			projectDir = abs
+			_ = os.Chdir(abs)
+		}
+	} else {
+		projectDir, _ = os.Getwd()
+	}
+
 	s := server.NewMCPServer(
 		"madock",
 		version.Version,
@@ -412,7 +430,8 @@ func runMadock(ctx context.Context, args ...string) (runResult, error) {
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, executable, args...)
-	cmd.Dir, _ = os.Getwd()
+	cmd.Dir = projectDir
+	cmd.Env = append(os.Environ(), "MADOCK_RUN_DIR="+projectDir)
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout

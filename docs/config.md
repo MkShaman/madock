@@ -57,7 +57,17 @@ madock config:list
 
 Set a configuration value:
 ```bash
+madock config:set php/version 8.2
+```
+
+Or use flags:
+```bash
 madock config:set --name=php/version --value=8.2
+```
+
+Save to global config (applies to all projects):
+```bash
+madock config:set proxy/mailpit/smtp_port 1026 --global
 ```
 
 Clear configuration cache:
@@ -86,6 +96,6 @@ Settings are inherited in this order (later overrides earlier):
 | `nodejs/enabled` | Standalone Node.js container | `false` |
 | `python/version` | Python version (custom platform) | `3.12` |
 | `go/version` | Go version (custom platform) | `1.22` |
-| `ruby/version` | Ruby version (custom platform) | `3.3` |
-
+| `ruby/version` | Ruby version (custom platform) | `3.3` || `proxy/mailpit/enabled` | Enable Mailpit email testing service | `true` |
+| `proxy/mailpit/smtp_port` | SMTP port for Mailpit (host side) | `1025` |
 See also: [Scopes](./scopes.md) for managing multiple environments per project.

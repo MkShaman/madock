@@ -8,6 +8,8 @@ MCP is an open standard that allows AI assistants (Claude Code, Cursor, VS Code 
 
 ## Setup
 
+> **Important:** MCP servers are often started by the editor from a directory other than the project folder (e.g. `~`). Always pass `-d /path/to/project` so madock knows which project to target.
+
 ### Claude Code
 
 Add to `~/.claude/settings.json` (global) or `.claude/settings.json` (per-project):
@@ -17,7 +19,7 @@ Add to `~/.claude/settings.json` (global) or `.claude/settings.json` (per-projec
   "mcpServers": {
     "madock": {
       "command": "madock",
-      "args": ["mcp"]
+      "args": ["mcp", "-d", "/path/to/your/project"]
     }
   }
 }
@@ -32,7 +34,7 @@ Add to `.cursor/mcp.json` in your project:
   "mcpServers": {
     "madock": {
       "command": "madock",
-      "args": ["mcp"]
+      "args": ["mcp", "-d", "/path/to/your/project"]
     }
   }
 }
@@ -47,7 +49,7 @@ Add to `.vscode/mcp.json` in your project:
   "servers": {
     "madock": {
       "command": "madock",
-      "args": ["mcp"]
+      "args": ["mcp", "-d", "${workspaceFolder}"]
     }
   }
 }
@@ -56,6 +58,12 @@ Add to `.vscode/mcp.json` in your project:
 ### Other MCP clients
 
 Any MCP-compatible client can connect using stdio transport:
+
+```
+madock mcp -d /path/to/your/project
+```
+
+If you run the command from within the project directory, `-d` can be omitted:
 
 ```
 madock mcp
