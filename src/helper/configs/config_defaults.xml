@@ -223,7 +223,7 @@
                 </rate_limit>
                 <mailpit>
                     <enabled>true</enabled>
-                    <smtp_port>1025</smtp_port>
+                    <smtp_port>2525</smtp_port>
                 </mailpit>
             </proxy>
             <container_name_prefix>madock_</container_name_prefix>
